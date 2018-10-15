@@ -4,6 +4,8 @@ import Login from './components/Login'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
+const LOCALSTORAGE_USER_KEY = 'loggedBlogappUser'
+
 class App extends React.Component {
   constructor(props) {
     super(props)
@@ -16,14 +18,19 @@ class App extends React.Component {
   }
 
   async componentDidMount() {
-    if (this.state.user) {
+    const loggedUserJSON = window.localStorage.getItem(LOCALSTORAGE_USER_KEY)
+    
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      this.setState({ user })
+      blogService.setToken(user.token)
       const blogs = await blogService.getAll()
       console.log('blogs:', blogs)
       this.setState({ blogs })
     } else {
       this.setState({ blogs: [] })
     }
-  } 
+  }
 
   handleLoginFieldChange = event => {
     this.setState({ [event.target.name]: event.target.value })
@@ -31,11 +38,13 @@ class App extends React.Component {
 
   handleLogin = async (event) => {
     event.preventDefault()
+    
     try {
       const user = await loginService.login({
         username: this.state.username,
         password: this.state.password
       })
+      window.localStorage.setItem(LOCALSTORAGE_USER_KEY, JSON.stringify(user))
       this.setState({ username: '', password: '', user })
       console.log('state\'s user:', this.state.user)
       blogService.setToken(user.token)
@@ -48,6 +57,13 @@ class App extends React.Component {
         this.setState({ error: null })
       }, 5000)
     }
+  }
+
+  handleLogout = (event) => {
+    event.preventDefault()
+
+    window.localStorage.removeItem(LOCALSTORAGE_USER_KEY)
+    this.setState({ user: null, blogs: [] })
   }
 
   render() {
@@ -67,7 +83,7 @@ class App extends React.Component {
     return (
       <div>
         <h2>blogs</h2>
-        <p>{this.state.user.name} logged in</p>
+        <p>{this.state.user.name} logged in <button onClick={this.handleLogout}>logout</button></p>
         {this.state.blogs.map(blog => 
           <Blog key={blog.id} blog={blog}/>
         )}
