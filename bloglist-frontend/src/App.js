@@ -2,8 +2,10 @@ import React from 'react'
 import Blog from './components/Blog'
 import Login from './components/Login'
 import NewBlogForm from './components/NewBlogForm'
+import Notification from'./components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import './index.css'
 
 const LOCALSTORAGE_USER_KEY = 'loggedBlogappUser'
 
@@ -14,7 +16,9 @@ class App extends React.Component {
       blogs: [],
       user: null,
       username: '',
-      password: ''
+      password: '',
+      error: null,
+      confirmation: null
     }
   }
 
@@ -24,7 +28,9 @@ class App extends React.Component {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       this.setState({ user })
+      
       blogService.setToken(user.token)
+      
       const blogs = await blogService.getAll()
       this.setState({ blogs })
     } else {
@@ -36,6 +42,16 @@ class App extends React.Component {
     this.setState({ [event.target.name]: event.target.value })
   }
 
+  notify = (type, message) => {
+    this.setState({
+      [type]: message
+    })
+
+    setTimeout(() => {
+      this.setState({ [type]: null })
+    }, 2500)
+  }
+
   handleLogin = async (event) => {
     event.preventDefault()
     
@@ -44,16 +60,23 @@ class App extends React.Component {
         username: this.state.username,
         password: this.state.password
       })
+
       window.localStorage.setItem(LOCALSTORAGE_USER_KEY, JSON.stringify(user))
-      this.setState({ username: '', password: '', user })
+      
+      this.setState({
+        username: '',
+        password: '',
+        user
+      })
+
       blogService.setToken(user.token)
+      
       const blogs = await blogService.getAll()
       this.setState({ blogs })
+      
+      this.notify('confirmation', `logged in as ${user.username}`)
     } catch (exception) {
-      this.setState({ error: 'username or password invalid' })
-      setTimeout(() => {
-        this.setState({ error: null })
-      }, 5000)
+      this.notify('error', 'username or password invalid')
     }
   }
 
@@ -62,18 +85,26 @@ class App extends React.Component {
 
     window.localStorage.removeItem(LOCALSTORAGE_USER_KEY)
     this.setState({ user: null, blogs: [] })
+
+    this.notify('confirmation', 'successfully logged out')
   }
 
   handleBlogCreation = (newBlog) => {
     this.setState({
       blogs: this.state.blogs.concat(newBlog)
     })
+
+    this.notify('confirmation', `a new blog '${newBlog.title}' by ${newBlog.author} added`)
   }
 
   render() {
     if (this.state.user === null) {
       return (
         <div>
+          <Notification
+            error={this.state.error}
+            notification={this.state.notification}
+          />
           <Login 
             username={this.state.username} 
             password={this.state.password} 
@@ -86,6 +117,10 @@ class App extends React.Component {
 
     return (
       <div>
+        <Notification
+          error={this.state.error}
+          confirmation={this.state.confirmation}
+        />
         <h2>blogs</h2>
         <p>{this.state.user.name} logged in <button onClick={this.handleLogout}>logout</button></p>
         <NewBlogForm blogService={blogService} blogCreationCallback={this.handleBlogCreation} />
