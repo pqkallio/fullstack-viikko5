@@ -2,6 +2,7 @@ import React from 'react'
 import Blog from './components/Blog'
 import Login from './components/Login'
 import NewBlogForm from './components/NewBlogForm'
+import Togglable from './components/Togglable'
 import Notification from'./components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -101,22 +102,26 @@ class App extends React.Component {
     if (this.state.user === null) {
       return (
         <div>
+          <h1>Blogs Blogs Blogs</h1>
           <Notification
             error={this.state.error}
             notification={this.state.notification}
           />
-          <Login 
-            username={this.state.username} 
-            password={this.state.password} 
-            handleLoginFieldChange={this.handleLoginFieldChange}
-            handleSubmit={this.handleLogin}
-          />
+          <Togglable buttonLabel='log in'>
+            <Login 
+              username={this.state.username} 
+              password={this.state.password} 
+              handleLoginFieldChange={this.handleLoginFieldChange}
+              handleSubmit={this.handleLogin}
+            />
+          </Togglable>
         </div>
       )
     }
 
     return (
       <div>
+        <h1>Blogs Blogs Blogs</h1>
         <Notification
           error={this.state.error}
           confirmation={this.state.confirmation}
