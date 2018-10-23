@@ -1,27 +1,19 @@
 import React from 'react';
 
-const Notification = ({ error, confirmation }) => {
-    if (!(error || confirmation)) {
+const Notification = ({ type, notification }) => {
+    if (!type) {
         return (
-            <div className='hiddenNotification'>
+            <div className='notification hiddenNotification'>
                 .
             </div>
         )
     }
 
-    if (error) {
-        return (
-            <div className='error'>
-                {error}    
-            </div>
-        );
-    }
-
     return (
-        <div className='confirmation'>
-            {confirmation}
+        <div className={'notification ' + type}>
+            {notification}    
         </div>
-    )
+    );
 };
 
 export default Notification;

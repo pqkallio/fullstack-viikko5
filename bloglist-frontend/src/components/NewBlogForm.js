@@ -6,6 +6,7 @@ class NewBlogForm extends Component {
         
         this.blogService = props.blogService
         this.blogCreationCallback = props.blogCreationCallback
+        this.errorCallback = props.errorCallback
         
         this.state = {
             title: '',
@@ -17,21 +18,26 @@ class NewBlogForm extends Component {
 
     handleBlogSubmit = async (event) => {
         event.preventDefault()
-        const blog = {
-            title: this.state.title,
-            author: this.state.author,
-            url: this.state.url
+
+        try {
+            const blog = {
+                title: this.state.title,
+                author: this.state.author,
+                url: this.state.url
+            }
+    
+            const response = await this.blogService.create(blog)
+            this.blogCreationCallback(response)
+    
+            this.setState({
+                title: '',
+                author: '', 
+                url: '',
+                submittingEnabled: false
+            })
+        } catch (exception) {
+            this.errorCallback(exception, 'unable to save new blog at the time, please try again')
         }
-
-        const response = await this.blogService.create(blog)
-        this.blogCreationCallback(response)
-
-        this.setState({
-            title: '',
-            author: '', 
-            url: '',
-            submittingEnabled: false
-        })
     }
 
     handleFormFieldChange = async (event) => {

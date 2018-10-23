@@ -16,21 +16,36 @@ class Togglable extends Component {
         const hideWhenVisible = { display: this.state.visible ? 'none' : '' }
         const showWhenVisible = { display: this.state.visible ? '' : 'none' }
         
-        return (
-            <div>
-                <div style={hideWhenVisible}>
-                    <button onClick={this.toggleVisibility}>
-                        {this.props.buttonLabel}
-                    </button>
+        if (this.props.type === 'button') {
+            return (
+                <div className={this.props.className}>
+                    <div style={hideWhenVisible}>
+                        <button onClick={this.toggleVisibility}>
+                            {this.props.toggleLabel}
+                        </button>
+                    </div>
+                    <div style={showWhenVisible}>
+                        {this.props.children}
+                        <button onClick={this.toggleVisibility}>
+                            {this.props.untoggleLabel}
+                        </button>
+                    </div>
                 </div>
-                <div style={showWhenVisible}>
-                    {this.props.children}
-                    <button onClick={this.toggleVisibility}>
-                        cancel
-                    </button>
+            );
+        } else if (this.props.type === 'div') {
+            return (
+                <div className={this.props.className}>
+                    <div onClick={this.toggleVisibility}>
+                        {this.props.toggleLabel}
+                    </div>
+                    <div style={showWhenVisible}>
+                        {this.props.children}
+                    </div>
                 </div>
-            </div>
-        );
+            )
+        }
+
+        return null
     }
 }
 

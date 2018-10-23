@@ -6,6 +6,7 @@ import Togglable from './components/Togglable'
 import Notification from'./components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import BlogHelpers from './utils/BlogHelpers'
 import './index.css'
 
 const LOCALSTORAGE_USER_KEY = 'loggedBlogappUser'
@@ -18,8 +19,8 @@ class App extends React.Component {
       user: null,
       username: '',
       password: '',
-      error: null,
-      confirmation: null
+      notificationType: null,
+      notification: ''
     }
   }
 
@@ -30,11 +31,24 @@ class App extends React.Component {
       const user = JSON.parse(loggedUserJSON)
       this.setState({ user })
       
+      this.setBlogs()
+
       blogService.setToken(user.token)
-      
-      const blogs = await blogService.getAll()
-      this.setState({ blogs })
     } else {
+      this.setState({ blogs: [] })
+    }
+  }
+
+  setBlogs = async () => {
+    try {
+      const blogs = await blogService.getAll()
+      blogs.sort(BlogHelpers.sort)
+      
+      this.setState({ blogs })
+    } catch (exception) {
+      console.log(exception)
+      this.notify('error', 'unable to retrieve blogs at the time, please try again')
+      
       this.setState({ blogs: [] })
     }
   }
@@ -45,11 +59,15 @@ class App extends React.Component {
 
   notify = (type, message) => {
     this.setState({
-      [type]: message
+      notificationType: type,
+      notification: message
     })
 
     setTimeout(() => {
-      this.setState({ [type]: null })
+      this.setState({
+        notificationType: null,
+        notification: ''
+      })
     }, 2500)
   }
 
@@ -72,8 +90,7 @@ class App extends React.Component {
 
       blogService.setToken(user.token)
       
-      const blogs = await blogService.getAll()
-      this.setState({ blogs })
+      this.setBlogs()
       
       this.notify('confirmation', `logged in as ${user.username}`)
     } catch (exception) {
@@ -91,11 +108,28 @@ class App extends React.Component {
   }
 
   handleBlogCreation = (newBlog) => {
+    const blogs = this.state.blogs.concat(newBlog)
+    blogs.sort(BlogHelpers.sort)
+    
     this.setState({
-      blogs: this.state.blogs.concat(newBlog)
+      blogs
     })
 
     this.notify('confirmation', `a new blog '${newBlog.title}' by ${newBlog.author} added`)
+  }
+
+  handleException = (exception, message) => {
+    this.notify('error', message)
+  }
+
+  handleLike = (likedBlog) => {
+    const blogs = this.state.blogs.filter(blog => blog.id !== likedBlog.id)
+    blogs.push(likedBlog)
+    blogs.sort(BlogHelpers.sort)
+
+    this.setState({
+      blogs
+    })
   }
 
   render() {
@@ -104,10 +138,14 @@ class App extends React.Component {
         <div>
           <h1>Blogs Blogs Blogs</h1>
           <Notification
-            error={this.state.error}
+            type={this.state.notificationType}
             notification={this.state.notification}
           />
-          <Togglable buttonLabel='log in'>
+          <Togglable
+            type='button'
+            toggleLabel='log in'
+            untoggleLabel='cancel'
+          >
             <Login 
               username={this.state.username} 
               password={this.state.password} 
@@ -123,14 +161,18 @@ class App extends React.Component {
       <div>
         <h1>Blogs Blogs Blogs</h1>
         <Notification
-          error={this.state.error}
-          confirmation={this.state.confirmation}
+          type={this.state.notificationType}
+          notification={this.state.notification}
         />
         <h2>blogs</h2>
         <p>{this.state.user.name} logged in <button onClick={this.handleLogout}>logout</button></p>
-        <NewBlogForm blogService={blogService} blogCreationCallback={this.handleBlogCreation} />
+        <NewBlogForm
+          blogService={blogService}
+          blogCreationCallback={this.handleBlogCreation}
+          errorCallback={this.handleException}
+        />
         {this.state.blogs.map(blog => 
-          <Blog key={blog.id} blog={blog}/>
+          <Blog key={blog.id} blog={blog} onLike={this.handleLike} />
         )}
       </div>
     );
