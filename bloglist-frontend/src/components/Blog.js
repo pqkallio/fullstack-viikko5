@@ -2,8 +2,17 @@ import React from 'react'
 import Togglable from './Togglable'
 import blogs from '../services/blogs'
 import BlogHelpers from '../utils/BlogHelpers'
+import PropTypes from 'prop-types'
 
 class Blog extends React.Component {
+  static propTypes = {
+    blog: PropTypes.object.isRequired,
+    onUpdate: PropTypes.func.isRequired,
+    onException: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
+    username: PropTypes.string.isRequired
+  }
+
   formatBlog() {
     return BlogHelpers.formatBlogToString(this.props.blog)
   }

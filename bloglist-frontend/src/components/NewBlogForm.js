@@ -1,12 +1,15 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 
 class NewBlogForm extends Component {
+    static propTypes = {
+        blogService: PropTypes.object.isRequired,
+        blogCreationCallback: PropTypes.func.isRequired,
+        errorCallback: PropTypes.func.isRequired
+    }
+    
     constructor(props) {
         super(props)
-        
-        this.blogService = props.blogService
-        this.blogCreationCallback = props.blogCreationCallback
-        this.errorCallback = props.errorCallback
         
         this.state = {
             title: '',
@@ -26,8 +29,8 @@ class NewBlogForm extends Component {
                 url: this.state.url
             }
     
-            const response = await this.blogService.create(blog)
-            this.blogCreationCallback(response)
+            const response = await this.props.blogService.create(blog)
+            this.props.blogCreationCallback(response)
     
             this.setState({
                 title: '',
@@ -36,7 +39,7 @@ class NewBlogForm extends Component {
                 submittingEnabled: false
             })
         } catch (exception) {
-            this.errorCallback(exception, 'unable to save new blog at the time, please try again')
+            this.props.errorCallback(exception, 'unable to save new blog at the time, please try again')
         }
     }
 
