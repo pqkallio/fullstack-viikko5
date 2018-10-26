@@ -8,4 +8,8 @@ const sort = (a, b) => {
     return likeDifference
 }
 
-export default { sort }
+const formatBlogToString = (blog) => {
+    return `'${blog.title}' by ${blog.author}`
+}
+
+export default { sort, formatBlogToString }

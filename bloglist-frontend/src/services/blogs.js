@@ -23,7 +23,13 @@ const create = async (blog) => {
   return response.data
 }
 
-const like = (blog, onSuccess) => async () => {
+const update = async (id, blog) => {
+  const response = await axios.put(`${baseUrl}/${id}`, blog, config())
+
+  return response
+}
+
+const like = async (blog) => {
   const updatedBlog = {
     title: blog.title,
     author: blog.author,
@@ -32,13 +38,15 @@ const like = (blog, onSuccess) => async () => {
     user: blog.user._id
   }
 
-  const response = await axios.put(`${baseUrl}/${blog.id}`, updatedBlog, config())
-
-  blog.likes += 1
-
-  onSuccess(blog)
-
+  const response = await update(blog.id, updatedBlog)
+  
   return response.data
 }
 
-export default { getAll, setToken, create, like }
+const deleteBlog = async (blog) => {
+    const response = await axios.delete(`${baseUrl}/${blog.id}`, config())
+    
+    return response.data
+}
+
+export default { getAll, setToken, create, like, deleteBlog }

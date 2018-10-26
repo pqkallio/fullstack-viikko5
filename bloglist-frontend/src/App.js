@@ -123,13 +123,24 @@ class App extends React.Component {
   }
 
   handleLike = (likedBlog) => {
-    const blogs = this.state.blogs.filter(blog => blog.id !== likedBlog.id)
-    blogs.push(likedBlog)
+    const blogs = this.state.blogs.map(blog =>
+      blog.id === likedBlog._id ? {...blog, likes: likedBlog.likes} : blog
+    )
     blogs.sort(BlogHelpers.sort)
 
     this.setState({
       blogs
     })
+  }
+
+  handleDelete = (blog) => {
+    const blogs = this.state.blogs.filter(b => b.id !== blog.id)
+
+    this.setState({
+      blogs
+    })
+
+    this.notify('confirmation', `${BlogHelpers.formatBlogToString(blog)} deleted`)
   }
 
   render() {
@@ -172,7 +183,14 @@ class App extends React.Component {
           errorCallback={this.handleException}
         />
         {this.state.blogs.map(blog => 
-          <Blog key={blog.id} blog={blog} onLike={this.handleLike} />
+          <Blog
+            key={blog.id}
+            blog={blog}
+            onUpdate={this.handleLike}
+            onException={this.handleException}
+            onDelete={this.handleDelete}
+            username={this.state.user.username}
+          />
         )}
       </div>
     );

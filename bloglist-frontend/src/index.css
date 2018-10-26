@@ -32,6 +32,8 @@
 }
 
 .blogInfo {
+    border: none;
+    cursor: default;
     font-weight: normal;
     padding-top: 10px;
     padding-left: 10px;
