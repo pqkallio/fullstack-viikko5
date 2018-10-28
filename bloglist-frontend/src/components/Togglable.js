@@ -43,10 +43,10 @@ class Togglable extends Component {
         } else if (this.props.type === 'div') {
             return (
                 <div className={this.props.className}>
-                    <div onClick={this.toggleVisibility}>
+                    <div className='toggleLabel' onClick={this.toggleVisibility}>
                         {this.props.toggleLabel}
                     </div>
-                    <div style={showWhenVisible}>
+                    <div className='togglableContent' style={showWhenVisible}>
                         {this.props.children}
                     </div>
                 </div>
