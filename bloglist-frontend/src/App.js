@@ -3,7 +3,7 @@ import Blog from './components/Blog'
 import Login from './components/Login'
 import NewBlogForm from './components/NewBlogForm'
 import Togglable from './components/Togglable'
-import Notification from'./components/Notification'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import BlogHelpers from './utils/BlogHelpers'
@@ -26,11 +26,11 @@ class App extends React.Component {
 
   async componentDidMount() {
     const loggedUserJSON = window.localStorage.getItem(LOCALSTORAGE_USER_KEY)
-    
+
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       this.setState({ user })
-      
+
       this.setBlogs()
 
       blogService.setToken(user.token)
@@ -43,12 +43,12 @@ class App extends React.Component {
     try {
       const blogs = await blogService.getAll()
       blogs.sort(BlogHelpers.sort)
-      
+
       this.setState({ blogs })
     } catch (exception) {
       console.log(exception)
       this.notify('error', 'unable to retrieve blogs at the time, please try again')
-      
+
       this.setState({ blogs: [] })
     }
   }
@@ -73,7 +73,7 @@ class App extends React.Component {
 
   handleLogin = async (event) => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({
         username: this.state.username,
@@ -81,7 +81,7 @@ class App extends React.Component {
       })
 
       window.localStorage.setItem(LOCALSTORAGE_USER_KEY, JSON.stringify(user))
-      
+
       this.setState({
         username: '',
         password: '',
@@ -89,9 +89,9 @@ class App extends React.Component {
       })
 
       blogService.setToken(user.token)
-      
+
       this.setBlogs()
-      
+
       this.notify('confirmation', `logged in as ${user.username}`)
     } catch (exception) {
       this.notify('error', 'username or password invalid')
@@ -110,7 +110,7 @@ class App extends React.Component {
   handleBlogCreation = (newBlog) => {
     const blogs = this.state.blogs.concat(newBlog)
     blogs.sort(BlogHelpers.sort)
-    
+
     this.setState({
       blogs
     })
@@ -124,7 +124,7 @@ class App extends React.Component {
 
   handleLike = (likedBlog) => {
     const blogs = this.state.blogs.map(blog =>
-      blog.id === likedBlog._id ? {...blog, likes: likedBlog.likes} : blog
+      blog.id === likedBlog._id ? { ...blog, likes: likedBlog.likes } : blog
     )
     blogs.sort(BlogHelpers.sort)
 
@@ -157,9 +157,9 @@ class App extends React.Component {
             toggleLabel='log in'
             untoggleLabel='cancel'
           >
-            <Login 
-              username={this.state.username} 
-              password={this.state.password} 
+            <Login
+              username={this.state.username}
+              password={this.state.password}
               handleLoginFieldChange={this.handleLoginFieldChange}
               handleSubmit={this.handleLogin}
             />
@@ -182,7 +182,7 @@ class App extends React.Component {
           blogCreationCallback={this.handleBlogCreation}
           errorCallback={this.handleException}
         />
-        {this.state.blogs.map(blog => 
+        {this.state.blogs.map(blog =>
           <Blog
             key={blog.id}
             blog={blog}

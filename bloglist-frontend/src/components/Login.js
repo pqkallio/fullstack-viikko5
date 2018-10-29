@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const Login = ({ username, password, handleLoginFieldChange, handleSubmit }) => (
-    <div>
+    <div className='loginFormContainer'>
         <h2>Log in to application</h2>
         <form onSubmit={handleSubmit}>
             <table>
@@ -14,12 +14,12 @@ const Login = ({ username, password, handleLoginFieldChange, handleSubmit }) => 
                             </label>
                         </td>
                         <td>
-                            <input 
-                                type='text' 
-                                name='username' 
-                                id='username' 
-                                value={username} 
-                                onChange={handleLoginFieldChange} 
+                            <input
+                                type='text'
+                                name='username'
+                                id='username'
+                                value={username}
+                                onChange={handleLoginFieldChange}
                             />
                         </td>
                     </tr>
@@ -30,12 +30,12 @@ const Login = ({ username, password, handleLoginFieldChange, handleSubmit }) => 
                             </label>
                         </td>
                         <td>
-                            <input 
-                                type='password' 
-                                name='password' 
-                                id='password' 
-                                value={password} 
-                                onChange={handleLoginFieldChange} 
+                            <input
+                                type='password'
+                                name='password'
+                                id='password'
+                                value={password}
+                                onChange={handleLoginFieldChange}
                             />
                         </td>
                     </tr>
